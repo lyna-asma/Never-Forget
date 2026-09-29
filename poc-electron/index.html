@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Never-Forget POC</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="widget">
+
+    <!-- This area will be used to drag the widget. -->
+    <div class="header" id="drag-area">
+      <strong>Never-Forget POC</strong>
+    </div>
+
+    <p>Desktop widget window test</p>
+
+    <div class="controls">
+      <button id="top">Toggle always on top</button>
+      <button id="move">Move window</button>
+      <button id="new">Create widget</button>
+    </div>
+
+  </div>
+
+<script>
+  document.getElementById("top").addEventListener("click", () => {
+    window.widgetAPI.toggleAlwaysOnTop();
+  });
+
+  document.getElementById("move").addEventListener("click", () => {
+    window.widgetAPI.moveWindow();
+  });
+
+  document.getElementById("new").addEventListener("click", () => {
+    window.widgetAPI.createWidget();
+  });
+</script>
+</body>
+</html>
+
