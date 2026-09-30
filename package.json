@@ -1,0 +1,28 @@
+{
+  "name": "never-forget",
+  "version": "0.1.0",
+  "description": "Cross-platform desktop widget application",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lyna-asma/Never-Forget.git"
+  },
+  "keywords": [
+    "desktop",
+    "widgets",
+    "electron",
+    "typescript"
+  ],
+  "author": "Lyna",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "electron": "^44.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
