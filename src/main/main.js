@@ -1,22 +1,25 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
-// This function creates one independent widget window.
-// Later, the widget's saved data will be passed into this function.
-function createWidget() {
-  const widget = new BrowserWindow({
-    width: 400,
-    height: 300,
+const { loadWidgets, saveWidgets } = require("./storage");
 
-    // These are the window behaviors we already tested successfully in the POC.
+// The currently loaded widget data.
+// For this milestone we only support one widget.
+let widgets = [];
+
+function createWidget(widgetData) {
+  const widget = new BrowserWindow({
+    width: widgetData.width,
+    height: widgetData.height,
+    x: widgetData.x,
+    y: widgetData.y,
+
     transparent: true,
     frame: false,
     resizable: true,
-    alwaysOnTop: false,
+    alwaysOnTop: widgetData.alwaysOnTop,
     skipTaskbar: true,
 
-    // The renderer stays separated from Node.js and Electron.
-    // preload.js is the controlled bridge between them.
     webPreferences: {
       preload: path.join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
@@ -24,23 +27,48 @@ function createWidget() {
     }
   });
 
-  // Load the visible widget interface.
   widget.loadFile(path.join(__dirname, "../renderer/index.html"));
+
+  // Save the widget's position whenever the user finishes moving it.
+  widget.on("moved", () => {
+    const [x, y] = widget.getPosition();
+
+    widgets[0].x = x;
+    widgets[0].y = y;
+
+    saveWidgets(app, widgets);
+  });
+
+  // Save the widget's size whenever the user finishes resizing it.
+  widget.on("resized", () => {
+    const [width, height] = widget.getSize();
+
+    widgets[0].width = width;
+    widgets[0].height = height;
+
+    saveWidgets(app, widgets);
+  });
+
+  return widget;
 }
 
-// The renderer asks to toggle the current widget's always-on-top state.
-// We find the BrowserWindow that sent the request and change its setting.
+// Renderer asks to toggle always-on-top.
 ipcMain.on("toggle-always-on-top", (event) => {
   const widget = BrowserWindow.fromWebContents(event.sender);
 
   if (!widget) return;
 
-  widget.setAlwaysOnTop(!widget.isAlwaysOnTop());
+  const newValue = !widget.isAlwaysOnTop();
+
+  widget.setAlwaysOnTop(newValue);
+
+  widgets[0].alwaysOnTop = newValue;
+
+  saveWidgets(app, widgets);
 });
 
-// The renderer asks to move the current widget.
-// This is still using the POC's fixed position for now.
-// Later, the position will come from the widget's saved data.
+// Renderer asks to move the widget.
+// This is still the POC button, so it moves to a fixed position.
 ipcMain.on("move-window", (event) => {
   const widget = BrowserWindow.fromWebContents(event.sender);
 
@@ -49,26 +77,50 @@ ipcMain.on("move-window", (event) => {
   widget.setPosition(100, 100);
 });
 
-// The renderer asks the application to create another widget.
+// Renderer asks for another widget.
+// Multiple-widget persistence is not implemented yet.
 ipcMain.on("create-widget", () => {
-  createWidget();
+  const newWidget = {
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    alwaysOnTop: false
+  };
+
+  widgets.push(newWidget);
+
+  saveWidgets(app, widgets);
+
+  createWidget(newWidget);
 });
 
-// Electron must finish starting before we create the first widget.
 app.whenReady().then(() => {
-  createWidget();
+  widgets = loadWidgets(app);
 
-  // macOS convention: recreate a window if the application is activated
-  // while no widget windows currently exist.
+  // First launch: create the initial widget.
+  if (widgets.length === 0) {
+    widgets.push({
+      x: 100,
+      y: 100,
+      width: 400,
+      height: 300,
+      alwaysOnTop: false
+    });
+
+    saveWidgets(app, widgets);
+  }
+
+  // For now, create the first saved widget.
+  createWidget(widgets[0]);
+
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWidget();
+      createWidget(widgets[0]);
     }
   });
 });
 
-// On Windows/Linux, closing all windows exits the application.
-// macOS normally keeps the application running until the user quits it.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
