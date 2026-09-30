@@ -1,11 +1,6 @@
 // The renderer talks to Electron through the small API exposed by preload.js.
 // It does not access Electron or Node.js directly.
 
-document
-  .getElementById("move-button")
-  .addEventListener("click", () => {
-    window.widgetAPI.moveWindow();
-  });
 
 document
   .getElementById("top-button")
@@ -17,4 +12,10 @@ document
   .getElementById("create-button")
   .addEventListener("click", () => {
     window.widgetAPI.createWidget();
+  });
+
+  document
+  .getElementById("delete-button")
+  .addEventListener("click", () => {
+    window.widgetAPI.deleteWidget();
   });

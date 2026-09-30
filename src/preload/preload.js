@@ -8,13 +8,13 @@ contextBridge.exposeInMainWorld("widgetAPI", {
     ipcRenderer.send("toggle-always-on-top");
   },
 
-  // Ask the main process to move this widget.
-  moveWindow() {
-    ipcRenderer.send("move-window");
-  },
 
   // Ask the main process to create another widget window.
   createWidget() {
     ipcRenderer.send("create-widget");
-  }
+  },
+
+  deleteWidget() {
+  ipcRenderer.send("delete-widget");
+}
 });

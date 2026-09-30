@@ -1,12 +1,23 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
+const crypto = require("crypto");
 
 const { loadWidgets, saveWidgets } = require("./storage");
 
-// The currently loaded widget data.
-// For this milestone we only support one widget.
 let widgets = [];
 
+// Creates a unique ID for every widget.
+function createWidgetId() {
+  return crypto.randomUUID();
+}
+
+
+// Find the saved data belonging to a specific widget.
+function findWidgetData(widgetId) {
+  return widgets.find((widget) => widget.id === widgetId);
+}
+
+// Create one Electron window from one saved widget object.
 function createWidget(widgetData) {
   const widget = new BrowserWindow({
     width: widgetData.width,
@@ -27,24 +38,36 @@ function createWidget(widgetData) {
     }
   });
 
+  // Store the widget ID on the window itself.
+  // This lets Electron know which saved widget this window represents.
+  widget.widgetId = widgetData.id;
+
   widget.loadFile(path.join(__dirname, "../renderer/index.html"));
 
-  // Save the widget's position whenever the user finishes moving it.
+  // Save this widget's new position after it is moved.
   widget.on("moved", () => {
+    const savedWidget = findWidgetData(widget.widgetId);
+
+    if (!savedWidget) return;
+
     const [x, y] = widget.getPosition();
 
-    widgets[0].x = x;
-    widgets[0].y = y;
+    savedWidget.x = x;
+    savedWidget.y = y;
 
     saveWidgets(app, widgets);
   });
 
-  // Save the widget's size whenever the user finishes resizing it.
+  // Save this widget's new size after it is resized.
   widget.on("resized", () => {
+    const savedWidget = findWidgetData(widget.widgetId);
+
+    if (!savedWidget) return;
+
     const [width, height] = widget.getSize();
 
-    widgets[0].width = width;
-    widgets[0].height = height;
+    savedWidget.width = width;
+    savedWidget.height = height;
 
     saveWidgets(app, widgets);
   });
@@ -58,35 +81,33 @@ ipcMain.on("toggle-always-on-top", (event) => {
 
   if (!widget) return;
 
+  const savedWidget = findWidgetData(widget.widgetId);
+
+  if (!savedWidget) return;
+
   const newValue = !widget.isAlwaysOnTop();
 
   widget.setAlwaysOnTop(newValue);
 
-  widgets[0].alwaysOnTop = newValue;
+  savedWidget.alwaysOnTop = newValue;
 
   saveWidgets(app, widgets);
 });
 
-// Renderer asks to move the widget.
-// This is still the POC button, so it moves to a fixed position.
-ipcMain.on("move-window", (event) => {
-  const widget = BrowserWindow.fromWebContents(event.sender);
 
-  if (!widget) return;
 
-  widget.setPosition(100, 100);
-});
-
-// Renderer asks for another widget.
-// Multiple-widget persistence is not implemented yet.
+// Renderer asks the application to create another widget.
 ipcMain.on("create-widget", () => {
-  const newWidget = {
-    x: 100,
-    y: 100,
-    width: 400,
-    height: 300,
-    alwaysOnTop: false
-  };
+const offset = widgets.length * 30;
+
+const newWidget = {
+  id: createWidgetId(),
+  x: 100 + offset,
+  y: 100 + offset,
+  width: 400,
+  height: 300,
+  alwaysOnTop: false
+};
 
   widgets.push(newWidget);
 
@@ -95,28 +116,56 @@ ipcMain.on("create-widget", () => {
   createWidget(newWidget);
 });
 
+ipcMain.on("delete-widget", (event) => {
+  const widget = BrowserWindow.fromWebContents(event.sender);
+
+  if (!widget) return;
+
+  const widgetId = widget.widgetId;
+
+  widgets = widgets.filter((savedWidget) => savedWidget.id !== widgetId);
+
+  saveWidgets(app, widgets);
+
+  widget.destroy();
+});
+
 app.whenReady().then(() => {
   widgets = loadWidgets(app);
+
+  // Existing data from the previous version does not have IDs.
+  // Give those widgets an ID before using them.
+  for (const widget of widgets) {
+    if (!widget.id) {
+      widget.id = createWidgetId();
+    }
+  }
 
   // First launch: create the initial widget.
   if (widgets.length === 0) {
     widgets.push({
+      id: createWidgetId(),
       x: 100,
       y: 100,
       width: 400,
       height: 300,
       alwaysOnTop: false
     });
-
-    saveWidgets(app, widgets);
   }
 
-  // For now, create the first saved widget.
-  createWidget(widgets[0]);
+  // Save in case IDs were added to existing data.
+  saveWidgets(app, widgets);
+
+  // Recreate every saved widget.
+  for (const widgetData of widgets) {
+    createWidget(widgetData);
+  }
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWidget(widgets[0]);
+      for (const widgetData of widgets) {
+        createWidget(widgetData);
+      }
     }
   });
 });
