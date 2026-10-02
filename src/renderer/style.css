@@ -1,49 +1,219 @@
 html,
 body {
   margin: 0;
+  padding: 0;
+
   width: 100%;
   height: 100%;
+
   background: transparent;
+
+  overflow: hidden;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 }
 
+
 body {
-  overflow: hidden;
+  user-select: none;
 }
+
 
 .widget {
   width: 100%;
   height: 100%;
+
   box-sizing: border-box;
 
-  background: rgba(255, 255, 255, 0.92);
+  background: #ffffff;
+
+  color: #222222;
+
   border-radius: 16px;
+
   overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow:
+    0 8px 30px
+    rgba(0, 0, 0, 0.18);
 }
 
-.header {
-  padding: 16px;
-  background: rgba(230, 230, 230, 0.9);
 
-  /* Electron lets this area act as the window's drag region. */
+.header {
+  height: 52px;
+
+  min-height: 52px;
+
+  padding:
+    0 16px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.04
+  );
+
   -webkit-app-region: drag;
 }
 
+
 .header h1 {
   margin: 0;
+
   font-size: 18px;
+
+  font-weight: 600;
+
+  flex: 1;
+
+  min-width: 0;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
 }
+
+
+.edit-indicator {
+  display: none;
+
+  font-size: 11px;
+
+  padding:
+    4px 7px;
+
+  border-radius: 6px;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.08
+  );
+
+  color: #555;
+}
+
 
 .content {
+  flex: 1;
+
+  min-height: 0;
+
   padding: 16px;
+
+  overflow: auto;
+
+  box-sizing: border-box;
 }
 
-.controls {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+
+.content-block {
+  margin:
+    0 0 10px 0;
+
+  min-height: 20px;
+
+  line-height: 1.45;
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
 }
 
-button {
+
+.widget-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  user-select: none;
+
+  pointer-events: none;
+}
+
+
+/* -----------------------------------------------
+   Edit mode
+------------------------------------------------ */
+
+body.edit-mode
+  .edit-indicator {
+  display: block;
+}
+
+
+body.edit-mode
+  .widget {
+  outline:
+    2px solid
+    rgba(
+      70,
+      120,
+      255,
+      0.7
+    );
+}
+
+
+.header h1[contenteditable="true"] {
   -webkit-app-region: no-drag;
-  cursor: pointer;
+
+  cursor: text;
+
+  outline: none;
+
+  user-select: text;
+}
+
+
+body.edit-mode
+  .content {
+  -webkit-app-region: no-drag;
+
+  user-select: text;
+}
+
+
+body.edit-mode
+  .content-block {
+  outline: none;
+
+  cursor: text;
+
+  user-select: text;
+
+  -webkit-app-region: no-drag;
+}
+
+
+/* -----------------------------------------------
+   Controls should remain clickable
+------------------------------------------------ */
+
+button,
+input,
+textarea,
+select {
+  -webkit-app-region: no-drag;
 }

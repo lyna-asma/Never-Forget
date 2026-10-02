@@ -1,36 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Never-Forget</title>
-    <link rel="stylesheet" href="./style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
 
-  <body>
-    <!--
-      This is the widget's visible content.
-      The header will later become the area we use to move the widget.
-    -->
-    <main class="widget">
-      <header class="header">
-        <h1>Never-Forget</h1>
-      </header>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
-      <section class="content">
-        <p>My first real widget.</p>
+  <title>Never-Forget</title>
 
-        <div class="controls">
-          <button id="top-button">Toggle always on top</button>
-          <button id="create-button">Create widget</button>
-          <button id="delete-button">Delete</button>
-        </div>
-      </section>
-    </main>
+  <link
+    rel="stylesheet"
+    href="./style.css"
+  />
+</head>
 
-    <script src="./renderer.js"></script>
-  </body>
+<body>
+
+  <main
+    id="widget"
+    class="widget"
+  >
+
+    <header
+      id="widget-header"
+      class="header"
+    >
+
+      <h1
+        id="widget-title"
+        class="editable"
+        contenteditable="false"
+      >
+        Never-Forget
+      </h1>
+
+      <span
+        id="edit-indicator"
+        class="edit-indicator"
+      >
+        Editing
+      </span>
+
+    </header>
+
+
+    <section
+      id="widget-content"
+      class="content"
+    >
+    </section>
+
+  </main>
+
+  <script src="./renderer.js"></script>
+
+</body>
 </html>

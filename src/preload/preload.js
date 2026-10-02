@@ -1,20 +1,99 @@
-// The preload runs between the renderer and Electron's main process.
-// It gives the renderer access only to the desktop actions we explicitly expose.
-const { contextBridge, ipcRenderer } = require("electron");
+const {
+  contextBridge,
+  ipcRenderer
+} = require("electron");
 
-contextBridge.exposeInMainWorld("widgetAPI", {
-  // Ask the main process to toggle the widget's always-on-top state.
-  toggleAlwaysOnTop() {
-    ipcRenderer.send("toggle-always-on-top");
-  },
+contextBridge.exposeInMainWorld(
+  "widgetAPI",
+  {
+    showWidgetMenu() {
+      ipcRenderer.send(
+        "show-widget-menu"
+      );
+    },
 
+    showDesktopMenu() {
+      ipcRenderer.send(
+        "show-desktop-menu"
+      );
+    },
 
-  // Ask the main process to create another widget window.
-  createWidget() {
-    ipcRenderer.send("create-widget");
-  },
+    exitEditMode() {
+      ipcRenderer.send(
+        "exit-edit-mode"
+      );
+    },
 
-  deleteWidget() {
-  ipcRenderer.send("delete-widget");
-}
-});
+    saveWidgetContent(data) {
+      ipcRenderer.send(
+        "save-widget-content",
+        data
+      );
+    },
+
+    onWidgetData(callback) {
+      ipcRenderer.on(
+        "widget-data",
+        (
+          _event,
+          data
+        ) => {
+          callback(data);
+        }
+      );
+    },
+
+    onEditModeChanged(
+      callback
+    ) {
+      ipcRenderer.on(
+        "edit-mode-changed",
+        (
+          _event,
+          editing
+        ) => {
+          callback(editing);
+        }
+      );
+    },
+
+    createWidget(type) {
+      ipcRenderer.send(
+        "create-widget",
+        type
+      );
+    },
+
+    openWidgetManager() {
+      ipcRenderer.send(
+        "open-widget-manager"
+      );
+    },
+
+    onManagerData(callback) {
+      ipcRenderer.on(
+        "manager-data",
+        (
+          _event,
+          data
+        ) => {
+          callback(data);
+        }
+      );
+    },
+
+    focusWidget(widgetId) {
+      ipcRenderer.send(
+        "manager-focus-widget",
+        widgetId
+      );
+    },
+
+    deleteWidget(widgetId) {
+      ipcRenderer.send(
+        "manager-delete-widget",
+        widgetId
+      );
+    }
+  }
+);
