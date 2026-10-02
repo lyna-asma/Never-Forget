@@ -2,70 +2,71 @@
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-
-  <title>
-    Never-Forget — Manage Widgets
-  </title>
-
-  <link
-    rel="stylesheet"
-    href="./manager.css"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Never-Forget — Manage Widgets & Notion</title>
+  <link rel="stylesheet" href="./manager.css" />
 </head>
 
 <body>
 
   <main class="manager">
 
+    <!-- Header -->
     <header class="manager-header">
-
       <div>
-        <h1>
-          Manage Widgets
-        </h1>
-
-        <p>
-          Create, view, and manage your desktop widgets.
-        </p>
+        <h1>Never-Forget Manager</h1>
+        <p>Manage your desktop widgets and your Notion connection.</p>
       </div>
 
       <div class="add-buttons">
-
-        <button
-          id="add-task"
-        >
-          + Task
-        </button>
-
-        <button
-          id="add-image"
-        >
-          + Image
-        </button>
-
+        <button id="add-task">+ Task Widget</button>
+        <button id="add-image">+ Image Widget</button>
       </div>
-
     </header>
 
+    <!-- Notion Integration Card -->
+    <section class="notion-panel">
+      <div class="notion-header">
+        <div class="notion-title">
+          <span class="notion-icon">✦</span>
+          <h2>Notion Workspace</h2>
+        </div>
+        <div id="notion-status-badge" class="badge-disconnected">
+          Disconnected
+        </div>
+      </div>
 
-    <section
-      id="widget-list"
-      class="widget-list"
-    >
+      <div id="notion-connect-form" class="notion-form">
+        <p class="notion-hint">
+          Connect your Notion account using an Internal Integration Token (starts with <code>secret_</code> or <code>ntn_</code>).
+        </p>
+        <div class="token-input-row">
+          <input
+            type="password"
+            id="notion-token-input"
+            placeholder="Paste your Notion Integration Token here..."
+            autocomplete="off"
+          />
+          <button id="notion-connect-btn">Connect</button>
+        </div>
+      </div>
+
+      <div id="notion-connected-info" class="notion-connected-row" style="display: none;">
+        <span id="notion-workspace-label">Connected to workspace</span>
+        <button id="notion-disconnect-btn" class="secondary">Disconnect</button>
+      </div>
+    </section>
+
+    <!-- Widgets Section -->
+    <section class="widgets-section">
+      <h2>Your Desktop Widgets</h2>
+      <div id="widget-list" class="widget-list"></div>
     </section>
 
   </main>
 
   <script src="./manager.js"></script>
-
 </body>
 
 </html>

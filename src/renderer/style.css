@@ -16,20 +16,18 @@ body {
     sans-serif;
 }
 
-
 body {
   user-select: none;
 }
 
-
 .widget {
+  position: relative;
   width: 100%;
   height: 100%;
 
   box-sizing: border-box;
 
   background: #ffffff;
-
   color: #222222;
 
   border-radius: 16px;
@@ -42,170 +40,269 @@ body {
   box-shadow:
     0 8px 30px
     rgba(0, 0, 0, 0.18);
+
+  transition: box-shadow 0.2s ease, outline 0.15s ease;
 }
 
+/* Transparent widgets (such as decorative images) */
+.widget.transparent-widget {
+  background: transparent !important;
+  box-shadow: none !important;
+}
 
 .header {
   height: 52px;
-
   min-height: 52px;
 
-  padding:
-    0 16px;
-
+  padding: 0 16px;
   box-sizing: border-box;
 
   display: flex;
-
   align-items: center;
-
   gap: 10px;
 
-  background: rgba(
-    0,
-    0,
-    0,
-    0.04
-  );
+  background: rgba(0, 0, 0, 0.04);
 
   -webkit-app-region: drag;
+  cursor: grab;
 }
 
+.header:active {
+  cursor: grabbing;
+}
 
 .header h1 {
   margin: 0;
 
   font-size: 18px;
-
   font-weight: 600;
 
   flex: 1;
-
   min-width: 0;
 
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
 }
 
+.notion-badge {
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  opacity: 0.8;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  padding: 2px 4px;
+}
+
+.notion-badge:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
 
 .edit-indicator {
   display: none;
 
   font-size: 11px;
+  font-weight: 600;
 
-  padding:
-    4px 7px;
-
+  padding: 4px 8px;
   border-radius: 6px;
 
-  background: rgba(
-    0,
-    0,
-    0,
-    0.08
-  );
+  background: #2563eb;
+  color: #ffffff;
 
-  color: #555;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
-
 
 .content {
   flex: 1;
-
   min-height: 0;
 
   padding: 16px;
-
   overflow: auto;
-
   box-sizing: border-box;
 }
 
-
-.content-block {
-  margin:
-    0 0 10px 0;
-
-  min-height: 20px;
-
-  line-height: 1.45;
-
-  white-space: pre-wrap;
-
-  word-break: break-word;
+/* On transparent image widgets, remove padding so image fills the container */
+.transparent-widget .content {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
 }
 
+/* -----------------------------------------------
+   Content blocks (text, bullet, checkbox)
+------------------------------------------------ */
+
+.content-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  margin: 0 0 8px 0;
+  min-height: 24px;
+
+  line-height: 1.5;
+  outline: none;
+}
+
+.content-block:last-child {
+  margin-bottom: 0;
+}
+
+/* Interactive Checkbox input */
+.checkbox-input {
+  margin: 4px 0 0 0;
+  cursor: pointer;
+
+  width: 16px;
+  height: 16px;
+
+  accent-color: #2563eb;
+  flex-shrink: 0;
+
+  -webkit-app-region: no-drag;
+}
+
+/* Bullet Point dot marker */
+.bullet-dot {
+  font-size: 16px;
+  line-height: 1.5;
+
+  color: #2563eb;
+  user-select: none;
+
+  flex-shrink: 0;
+  width: 16px;
+
+  text-align: center;
+}
+
+/* Editable text portion of any block */
+.block-text {
+  flex: 1;
+  min-width: 0;
+
+  outline: none;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  line-height: 1.5;
+}
+
+/* Completed / Checked state */
+.content-block.is-checked .block-text {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* -----------------------------------------------
+   Image Widget
+------------------------------------------------ */
 
 .widget-image {
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  user-select: none;
+  -webkit-user-drag: none;
+  cursor: grab;
+}
 
+.widget-image:active {
+  cursor: grabbing;
+}
+
+/* Empty image placeholder */
+.image-placeholder {
   width: 100%;
   height: 100%;
 
-  object-fit: contain;
+  box-sizing: border-box;
 
-  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  pointer-events: none;
+  text-align: center;
+  padding: 24px;
+
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.7);
+
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+.image-placeholder:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #2563eb;
+}
+
+.image-placeholder p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
 
 /* -----------------------------------------------
    Edit mode
 ------------------------------------------------ */
 
-body.edit-mode
-  .edit-indicator {
+body.edit-mode .edit-indicator {
   display: block;
 }
 
-
-body.edit-mode
-  .widget {
-  outline:
-    2px solid
-    rgba(
-      70,
-      120,
-      255,
-      0.7
-    );
+body.edit-mode .widget {
+  outline: 2px solid rgba(37, 99, 235, 0.85);
+  box-shadow: 0 12px 35px rgba(37, 99, 235, 0.2);
 }
 
+body.edit-mode .transparent-widget {
+  outline: 2px dashed rgba(37, 99, 235, 0.85);
+}
 
 .header h1[contenteditable="true"] {
   -webkit-app-region: no-drag;
-
   cursor: text;
-
   outline: none;
-
   user-select: text;
 }
 
+body.edit-mode .content {
+  -webkit-app-region: no-drag;
+  user-select: text;
+}
 
-body.edit-mode
-  .content {
+body.edit-mode .block-text {
+  outline: none;
+  cursor: text;
+  user-select: text;
   -webkit-app-region: no-drag;
 
-  user-select: text;
+  padding: 2px 4px;
+  border-radius: 4px;
+
+  transition: background 0.15s ease;
 }
 
-
-body.edit-mode
-  .content-block {
-  outline: none;
-
-  cursor: text;
-
-  user-select: text;
-
-  -webkit-app-region: no-drag;
+body.edit-mode .block-text:focus {
+  background: rgba(37, 99, 235, 0.08);
 }
-
 
 /* -----------------------------------------------
    Controls should remain clickable
@@ -216,4 +313,274 @@ input,
 textarea,
 select {
   -webkit-app-region: no-drag;
+}
+
+/* -----------------------------------------------
+   Typography / Font Styles
+------------------------------------------------ */
+
+.font-sans {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.font-tactical {
+  font-family: "Segoe UI", "Arial Black", Impact, sans-serif;
+}
+
+.font-tactical .header h1 {
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.font-handwritten {
+  font-family: "Segoe Print", "Caveat", "Comic Sans MS", cursive, sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.font-mono {
+  font-family: "Consolas", "Cascadia Code", "Courier New", monospace;
+  letter-spacing: -0.2px;
+}
+
+/* -----------------------------------------------
+   Theme Presets (Demon Slayer, Valorant, Sticky Palettes)
+------------------------------------------------ */
+
+/* Valorant Protocol Theme */
+.widget.theme-valorant {
+  background: #0f1923 !important;
+  color: #ece8e1 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 70, 85, 0.35) !important;
+}
+
+.widget.theme-valorant .header {
+  background: #14222d !important;
+  border-left: 4px solid #ff4655 !important;
+  border-bottom: 1px solid rgba(255, 70, 85, 0.2) !important;
+}
+
+.widget.theme-valorant .header h1 {
+  color: #ece8e1 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.widget.theme-valorant .checkbox-input {
+  accent-color: #ff4655 !important;
+}
+
+.widget.theme-valorant .bullet-dot {
+  color: #ff4655 !important;
+}
+
+.widget.theme-valorant .content-block.is-checked .block-text {
+  color: #768079 !important;
+  opacity: 0.6;
+}
+
+.widget.theme-valorant .notion-badge {
+  color: #ff4655 !important;
+}
+
+/* Demon Slayer Nichirin Theme */
+.widget.theme-demon-slayer {
+  background: #121815 !important;
+  color: #f3f4f6 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(16, 185, 129, 0.4) !important;
+}
+
+.widget.theme-demon-slayer .header {
+  background: linear-gradient(135deg, #163024 0%, #0d1a14 100%) !important;
+  border-left: 4px solid #10b981 !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+
+.widget.theme-demon-slayer .header h1 {
+  color: #34d399 !important;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.widget.theme-demon-slayer .checkbox-input {
+  accent-color: #10b981 !important;
+}
+
+.widget.theme-demon-slayer .bullet-dot {
+  color: #ef4444 !important;
+}
+
+.widget.theme-demon-slayer .content-block.is-checked .block-text {
+  color: #6b7280 !important;
+  opacity: 0.55;
+}
+
+.widget.theme-demon-slayer .notion-badge {
+  color: #10b981 !important;
+}
+
+/* Classic Sticky Yellow */
+.widget.theme-yellow {
+  background: #fef9c3 !important;
+  color: #713f12 !important;
+  box-shadow: 0 8px 25px rgba(202, 138, 4, 0.2) !important;
+}
+
+.widget.theme-yellow .header {
+  background: #fef08a !important;
+  border-bottom: 1px solid rgba(202, 138, 4, 0.15) !important;
+}
+
+.widget.theme-yellow .header h1 {
+  color: #713f12 !important;
+}
+
+.widget.theme-yellow .checkbox-input {
+  accent-color: #ca8a04 !important;
+}
+
+.widget.theme-yellow .bullet-dot {
+  color: #ca8a04 !important;
+}
+
+/* Pastel Sky Blue */
+.widget.theme-blue {
+  background: #f0f9ff !important;
+  color: #0369a1 !important;
+  box-shadow: 0 8px 25px rgba(2, 132, 199, 0.18) !important;
+}
+
+.widget.theme-blue .header {
+  background: #e0f2fe !important;
+  border-bottom: 1px solid rgba(2, 132, 199, 0.15) !important;
+}
+
+.widget.theme-blue .header h1 {
+  color: #0369a1 !important;
+}
+
+.widget.theme-blue .checkbox-input {
+  accent-color: #0284c7 !important;
+}
+
+.widget.theme-blue .bullet-dot {
+  color: #0284c7 !important;
+}
+
+/* Mint Sage Green */
+.widget.theme-mint {
+  background: #f0fdf4 !important;
+  color: #166534 !important;
+  box-shadow: 0 8px 25px rgba(22, 101, 52, 0.18) !important;
+}
+
+.widget.theme-mint .header {
+  background: #dcfce7 !important;
+  border-bottom: 1px solid rgba(22, 101, 52, 0.15) !important;
+}
+
+.widget.theme-mint .header h1 {
+  color: #166534 !important;
+}
+
+.widget.theme-mint .checkbox-input {
+  accent-color: #15803d !important;
+}
+
+.widget.theme-mint .bullet-dot {
+  color: #15803d !important;
+}
+
+/* Lavender Dream */
+.widget.theme-lavender {
+  background: #faf5ff !important;
+  color: #6b21a8 !important;
+  box-shadow: 0 8px 25px rgba(107, 33, 168, 0.18) !important;
+}
+
+.widget.theme-lavender .header {
+  background: #f3e8ff !important;
+  border-bottom: 1px solid rgba(107, 33, 168, 0.15) !important;
+}
+
+.widget.theme-lavender .header h1 {
+  color: #6b21a8 !important;
+}
+
+.widget.theme-lavender .checkbox-input {
+  accent-color: #9333ea !important;
+}
+
+.widget.theme-lavender .bullet-dot {
+  color: #9333ea !important;
+}
+
+/* Rose Quartz / Peach */
+.widget.theme-rose {
+  background: #fff1f2 !important;
+  color: #9f1239 !important;
+  box-shadow: 0 8px 25px rgba(159, 18, 57, 0.18) !important;
+}
+
+.widget.theme-rose .header {
+  background: #ffe4e6 !important;
+  border-bottom: 1px solid rgba(159, 18, 57, 0.15) !important;
+}
+
+.widget.theme-rose .header h1 {
+  color: #9f1239 !important;
+}
+
+.widget.theme-rose .checkbox-input {
+  accent-color: #e11d48 !important;
+}
+
+.widget.theme-rose .bullet-dot {
+  color: #e11d48 !important;
+}
+
+/* Dark Mode / Stealth Obsidian */
+.widget.theme-dark {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5) !important;
+}
+
+.widget.theme-dark .header {
+  background: #0f172a !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.widget.theme-dark .header h1 {
+  color: #f8fafc !important;
+}
+
+.widget.theme-dark .checkbox-input {
+  accent-color: #38bdf8 !important;
+}
+
+.widget.theme-dark .bullet-dot {
+  color: #38bdf8 !important;
+}
+
+.widget.theme-dark .content-block.is-checked .block-text {
+  color: #64748b !important;
+}
+
+/* Clean Minimal White */
+.widget.theme-white {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14) !important;
+}
+
+.widget.theme-white .header {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.widget.theme-white .checkbox-input {
+  accent-color: #2563eb !important;
+}
+
+.widget.theme-white .bullet-dot {
+  color: #2563eb !important;
 }
